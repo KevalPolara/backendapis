@@ -1,7 +1,8 @@
+const sequelize = require("../config/db");
 const { DataTypes } = require("sequelize");
-const sequelize = require("../index");
+const CampaignOwner = sequelize.define("campaigns", { name: DataTypes.STRING });
 
-sequelize.define("Campaign", {
+const Campaign = sequelize.define("campaigns", {
   uniqueId: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -21,10 +22,10 @@ sequelize.define("Campaign", {
     unique: true,
     validate: {
       notNull: {
-        msg: "Please Enter a UserName",
+        msg: "Please Enter a Valid Name",
       },
 
-      notEmpty: { msg: "UserName CanNot be Empty" },
+      notEmpty: { msg: "Name CanNot be Empty" },
     },
   },
   description: {
@@ -32,7 +33,7 @@ sequelize.define("Campaign", {
     allowNull: false,
     validate: {
       notNull: {
-        msg: "Please Enter a Description",
+        msg: "Please Enter a Valid Description",
       },
 
       notEmpty: { msg: "Description CanNot be Empty" },
@@ -41,7 +42,7 @@ sequelize.define("Campaign", {
       },
     },
   },
-  goal_amount: {
+  amount: {
     type: DataTypes.INTEGER,
     allowNull: false,
     validate: {
@@ -52,7 +53,7 @@ sequelize.define("Campaign", {
       notEmpty: { msg: "Amount CanNot be Empty" },
     },
   },
-  expiration_date: {
+  expirydate: {
     type: DataTypes.DATEONLY,
     allowNull: false,
     validate: {
@@ -68,9 +69,22 @@ sequelize.define("Campaign", {
     allowNull: false,
     defaultValue: "active",
   },
+
+  Owner_Id: {
+    type: DataTypes.INTEGER,
+    reference: {
+      model: CampaignOwner,
+      key: "id",
+    },
+  },
 });
 
-Campaign.addHook("beforeSave", (campaign, options) => {
+Campaign.hasMany(CampaignOwner, {
+  foreignKey: "Owner_Id",
+});
+CampaignOwner.belongsTo(Campaign);
+
+Campaign.addHook("beforeSave", (campaign) => {
   if (campaign.expiration_date < new Date()) {
     campaign.status = "expired";
   } else if (campaign.amount > String(1000)) {
@@ -78,5 +92,4 @@ Campaign.addHook("beforeSave", (campaign, options) => {
   }
 });
 
-
-module.exports = sequelize;
+module.exports = Campaign;
