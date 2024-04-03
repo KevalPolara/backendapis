@@ -1,6 +1,5 @@
 const sequelize = require("../config/db");
 const { DataTypes } = require("sequelize");
-const Campaign = require("./campaign");
 const Campaign = sequelize.define("Campaign", {
   name: DataTypes.STRING,
 });
@@ -16,7 +15,7 @@ const CampaignDonator = sequelize.define("campaigndonators", {
       },
     },
   },
-  nickName: {
+  nickname: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
@@ -35,18 +34,18 @@ const CampaignDonator = sequelize.define("campaigndonators", {
     defaultValue: "Valid",
   },
 
-  Campaign_Id: {
-    type: DataTypes.INTEGER,
-    reference: {
-      model: Campaign,
-      key: "id",
-    },
-  },
+  // campaign_id: {
+  //   type: DataTypes.INTEGER,
+  //   reference: {
+  //     model: Campaign,
+  //     key: "id",
+  //   },
+  // },
 });
 
-Campaign.hasMany(Campaign, {
-  foreignKey: "Campaign_Id",
+Campaign.hasMany(CampaignDonator, {
+  foreignKey: "campaign_id",
 });
-CampaignOwner.belongsTo(Campaign);
+CampaignDonator.belongsTo(Campaign);
 
 module.exports = CampaignDonator;

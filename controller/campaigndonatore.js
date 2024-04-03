@@ -1,7 +1,25 @@
 const CampaignDonator = require("../models/campaigndonatore");
+const Joi = require("joi");
+
+
+const validateCampaignDonator = (campaingDonatorData) => {
+  console.log("can i reach here", campaingDonatorData);
+  {
+    const joiSchema = Joi.object({
+      amount: Joi.number().required("Number is Required"),
+      username: Joi.string()
+        .min(3)
+        .max(300)
+        .required("NickName is Required"),
+    }).options({ abortEarly: false });
+
+    return joiSchema.validate(campaingDonatorData);
+  }
+};
 
 module.exports.addCampainDonatorData = async (req, res) => {
   const campaingDonatorData = req.body;
+  validateCampaignDonator(campaingDonatorData);
   console.log("campaingDonatorData", campaingDonatorData);
   try {
     const addCampaignDonorData = await CampaignDonator.create(

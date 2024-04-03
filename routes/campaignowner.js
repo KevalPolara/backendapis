@@ -3,6 +3,6 @@ const { addCampaignOwnerData, getCampaignOwnerData } = require("../controller/ca
 const router = express.Router();
 
 router.post("/addcampaignowner", addCampaignOwnerData);
-router.post("/getcampaignowner", getCampaignOwnerData);
+router.get("/getcampaignowner", getCampaignOwnerData);
 
 module.exports = router;

@@ -2,7 +2,7 @@ const sequelize = require("../config/db");
 const { DataTypes } = require("sequelize");
 
 const CampaignOwner = sequelize.define("campaignowners", {
-  User_Id: {
+  user_id: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
@@ -12,7 +12,7 @@ const CampaignOwner = sequelize.define("campaignowners", {
       },
     },
   },
-  UserName: {
+  username: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
@@ -20,11 +20,9 @@ const CampaignOwner = sequelize.define("campaignowners", {
       notNull: {
         msg: "Please Enter a Valid UserName",
       },
-
-      notEmpty: { msg: "UserName CanNot be Empty" },
     },
   },
-  Crypto_Wallet_Address: {
+  crypto_wallet_address: {
     type: DataTypes.STRING,
     allowNull: false,
     validate: {
@@ -39,8 +37,5 @@ const CampaignOwner = sequelize.define("campaignowners", {
     },
   },
 });
-
-
-
 
 module.exports = CampaignOwner;

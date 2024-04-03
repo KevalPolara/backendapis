@@ -1,12 +1,15 @@
 const sequelize = require("../config/db");
 const { DataTypes } = require("sequelize");
-const CampaignOwner = sequelize.define("campaigns", { name: DataTypes.STRING });
+const CampaignOwner = sequelize.define("campaignowners", {
+  name: DataTypes.STRING,
+});
 
 const Campaign = sequelize.define("campaigns", {
-  uniqueId: {
+  uniqueid: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
+
     defaultValue: () => {
       return Math.random().toString(36).substring(2, 10);
     },
@@ -16,6 +19,7 @@ const Campaign = sequelize.define("campaigns", {
       },
     },
   },
+
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -28,6 +32,7 @@ const Campaign = sequelize.define("campaigns", {
       notEmpty: { msg: "Name CanNot be Empty" },
     },
   },
+
   description: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -42,6 +47,7 @@ const Campaign = sequelize.define("campaigns", {
       },
     },
   },
+
   amount: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -53,24 +59,26 @@ const Campaign = sequelize.define("campaigns", {
       notEmpty: { msg: "Amount CanNot be Empty" },
     },
   },
+
   expirydate: {
     type: DataTypes.DATEONLY,
     allowNull: false,
     validate: {
       notNull: {
-        msg: "Please Enter a Date",
+        msg: "Please  Enter a Date",
       },
 
       notEmpty: { msg: "Date CanNot be Empty" },
     },
   },
+
   status: {
     type: DataTypes.ENUM("active", "expired", "fraud", "succesfull"),
     allowNull: false,
     defaultValue: "active",
   },
 
-  Owner_Id: {
+  owner_id: {
     type: DataTypes.INTEGER,
     reference: {
       model: CampaignOwner,
@@ -80,14 +88,18 @@ const Campaign = sequelize.define("campaigns", {
 });
 
 Campaign.hasMany(CampaignOwner, {
-  foreignKey: "Owner_Id",
+  foreignKey: "owner_id",
+  as: "owner",
 });
-CampaignOwner.belongsTo(Campaign);
+CampaignOwner.belongsTo(Campaign, {
+  foreignKey: "owner_id",
+  as: "campaign",
+});
 
 Campaign.addHook("beforeSave", (campaign) => {
   if (campaign.expiration_date < new Date()) {
     campaign.status = "expired";
-  } else if (campaign.amount > String(1000)) {
+  } else if (campaign.amount > String(100000)) {
     campaign.status = "SuccesFull";
   }
 });

@@ -1,12 +1,13 @@
 const express = require("express");
 const app = express();
-app.use(express.urlencoded({ extended: true }));
+const indexRouter = require("./routes/index");
 const cors = require("cors");
+
+
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(cors());
-
-const indexRouter = require("./routes/campain");
 
 app.use("/v1", indexRouter);
 
