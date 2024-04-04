@@ -1,4 +1,4 @@
-const CampaignOwner = require("../models/campaignowner");
+const CampaignOwner = require("../models/owner.model");
 const Joi = require("joi");
 
 const validateCampaignOwner = (campainOwnerData) => {

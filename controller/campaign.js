@@ -1,5 +1,6 @@
-const Campaign = require("../models/campaign");
+const Campaign = require("../models/campaign.model");
 const Joi = require("joi");
+const { Op } = require("sequelize");
 
 const validateCampaign = (campaingData) => {
   console.log("can i reach here", campaingData);
@@ -16,25 +17,39 @@ const validateCampaign = (campaingData) => {
         .required("Minimum 3 and 300 letters is Required"),
       amount: Joi.number().required("Amount is Required"),
       expirydate: Joi.date().required("ExpiryDate is Required"),
-    }).options({ abortEarly: false });
+      owner_id: Joi.number().required("Owner_Id is Required"),
+    }).options({ abortEarly: true });
 
     return joiSchema.validate(campaingData);
   }
 };
 
 module.exports.addCampainData = async (req, res) => {
-  const campaingData = req.body;
-  console.log("campaingData", campaingData);
-
-  const campaignValidationData = validateCampaign(campaingData);
-  console.log("campaignValidationData", campaignValidationData);
-  if (campaingData.expirydate < new Date()) {
-    return res.status(500).json({ Message: "Campaign is Expired" });
-  }
-
   try {
-    const addCampaignData = await Campaign.create(campaingData);
-    console.log("addCampaignData", addCampaignData);
+    const campaingData = req.body;
+
+    const { value, error } = validateCampaign(campaingData);
+    if (error) {
+      console.log("error", error);
+    }
+
+   
+      const campaignData = await Campaign.update(
+        { status: "expiry" },
+        {
+          where: {
+            expirydate: {
+              $lt: new Date(),
+            },
+          },
+          returning: true,
+        }
+      );
+
+      console.log("campaignData", campaignData);
+
+    const addCampaignData = await Campaign.create(value);
+
     if (!addCampaignData) {
       return res.status(500).json({ Message: "Campaign User Not Found" });
     }

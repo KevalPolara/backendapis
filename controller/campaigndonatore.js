@@ -1,4 +1,4 @@
-const CampaignDonator = require("../models/campaigndonatore");
+const CampaignDonator = require("../models/donator.model");
 const Joi = require("joi");
 
 
