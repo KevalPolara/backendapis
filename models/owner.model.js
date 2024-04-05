@@ -1,5 +1,6 @@
 const sequelize = require("../config/db");
 const { DataTypes } = require("sequelize");
+const campaign = require("./campaign.model");
 
 const campaignOwner = sequelize.define("campaignowners", {
   id: {
@@ -26,5 +27,7 @@ const campaignOwner = sequelize.define("campaignowners", {
     allowNull: false,
   },
 });
+
+// campaignOwner.hasMany(campaign, { foreignKey: "owner_id" });
 
 module.exports = campaignOwner;

@@ -13,13 +13,11 @@ const campaignDonator = sequelize.define("campaigndonators", {
   amount: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
   },
 
   nickname: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
   },
 
   status: {

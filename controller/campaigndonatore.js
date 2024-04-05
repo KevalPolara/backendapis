@@ -1,16 +1,13 @@
 const CampaignDonator = require("../models/donator.model");
 const Joi = require("joi");
 
-
 const validateCampaignDonator = (campaingDonatorData) => {
   console.log("can i reach here", campaingDonatorData);
   {
     const joiSchema = Joi.object({
       amount: Joi.number().required("Number is Required"),
-      username: Joi.string()
-        .min(3)
-        .max(300)
-        .required("NickName is Required"),
+      nickname: Joi.string().min(3).max(300).required("NickName is Required"),
+      campaign_id: Joi.number().required("campaign_id is Required"),
     }).options({ abortEarly: false });
 
     return joiSchema.validate(campaingDonatorData);
@@ -18,13 +15,20 @@ const validateCampaignDonator = (campaingDonatorData) => {
 };
 
 module.exports.addCampainDonatorData = async (req, res) => {
+  console.log("addCampainDonatorData");
+  console.log("can i reach here");
+
   const campaingDonatorData = req.body;
-  validateCampaignDonator(campaingDonatorData);
   console.log("campaingDonatorData", campaingDonatorData);
   try {
-    const addCampaignDonorData = await CampaignDonator.create(
-      campaingDonatorData
-    );
+    const { value, error } = validateCampaignDonator(campaingDonatorData);
+    console.log("value", value);
+
+    if (error) {
+      console.log(error, "error");
+      throw Error;
+    }
+    const addCampaignDonorData = await CampaignDonator.create(value);
     console.log("addCampaignDonorData", addCampaignDonorData);
 
     if (!addCampaignDonorData) {

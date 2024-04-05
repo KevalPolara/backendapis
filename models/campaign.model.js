@@ -2,6 +2,8 @@ const sequelize = require("../config/db");
 const { DataTypes } = require("sequelize");
 const campaignOwner = require("./owner.model");
 const cron = require("node-cron");
+const { Op } = require("sequelize");
+const campaignDonator = require("./donator.model");
 
 const campaign = sequelize.define("campaigns", {
   id: {
@@ -47,20 +49,48 @@ const campaign = sequelize.define("campaigns", {
   },
 });
 
-// campaign.hasMany(campaignOwner);
-// campaignOwner.belongsTo(campaign);
+campaign.belongsTo(campaignDonator, { foreignKey: "campaign_id" });
 
-// campaign.addHook("afterSave", (campaign) => {
-//   console.log("campaign" , campaign);
-//   console.log(campaign.expiration_date , new Date());
-//   if (campaign.expiration_date < new Date()) {
-//     campaign.status = "expired";
-//   }
-//   else if (campaign.amount > String(100000)) {
-//     campaign.status = "SuccesFull";
-//   }
-// });
+cron.schedule("*/10 * * * * *", async function () {
+  try {
+    const currentDate = new Date();
+    const totalDonated = await campaignDonator.sum("amount", {
+      where: {
+        amount: {
+          [Op.gt]: 0,
+        },
+      },
+    });
 
+    if (totalDonated) {
+      const campaignsToUpdate = await campaign.update(
+        { status: "successful" },
+        {
+          where: {
+            amount: { [Op.lte]: totalDonated },
+          },
+        }
+      );
 
+      console.log("campaignsToUpdate", campaignsToUpdate);
+    } else {
+      await campaign.update(
+        { status: "expired" },
+        {
+          where: {
+            expirydate: {
+              [Op.lt]: currentDate.toISOString(),
+            },
+          },
+        },
+        {
+          new: true,
+        }
+      );
+    }
+  } catch (error) {
+    console.error("error", error);
+  }
+});
 
 module.exports = campaign;

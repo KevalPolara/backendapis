@@ -1,6 +1,5 @@
 const Campaign = require("../models/campaign.model");
 const Joi = require("joi");
-const { Op } = require("sequelize");
 
 const validateCampaign = (campaingData) => {
   console.log("can i reach here", campaingData);
@@ -32,23 +31,13 @@ module.exports.addCampainData = async (req, res) => {
     if (error) {
       console.log("error", error);
     }
-
-   
-      const campaignData = await Campaign.update(
-        { status: "expiry" },
-        {
-          where: {
-            expirydate: {
-              $lt: new Date(),
-            },
-          },
-          returning: true,
-        }
-      );
-
-      console.log("campaignData", campaignData);
-
     const addCampaignData = await Campaign.create(value);
+
+    if (value.expirydate < new Date()) {
+      value.status = "expired";
+    }
+
+    console.log("value", value.status);
 
     if (!addCampaignData) {
       return res.status(500).json({ Message: "Campaign User Not Found" });
